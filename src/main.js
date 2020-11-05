@@ -1,6 +1,7 @@
-import { createApp } from "vue";
+import { createApp, h, provide } from "vue";
 import App from "./App.vue";
-import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
+import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { DefaultApolloClient } from "@vue/apollo-composable";
 import "./registerServiceWorker";
 import router from "./router";
 
@@ -9,22 +10,13 @@ const defaultClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-const query = gql`
-  query AllWines {
-    allWines {
-      title
-      description
-      variety
-    }
-  }
-`;
-
-defaultClient
-  .query({
-    query,
-  })
-  .then(res => console.log(res));
-
-createApp(App)
+createApp({
+  setup() {
+    provide(DefaultApolloClient, defaultClient);
+  },
+  render() {
+    return h(App);
+  },
+})
   .use(router)
   .mount("#app");
